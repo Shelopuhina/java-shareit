@@ -24,7 +24,4 @@ public class Item {
     private Boolean available;
     private Integer owner;
     private ItemRequest request;
-    protected boolean isAvailable() {
-        return getAvailable();
-    }
 }
