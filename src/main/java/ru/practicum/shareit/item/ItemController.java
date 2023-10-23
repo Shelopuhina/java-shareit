@@ -20,15 +20,15 @@ public class ItemController {
     private final ItemService service;
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") int userId, @RequestBody @Valid Item item) {
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") int userId, @RequestBody @Valid ItemDto itemDto) {
         log.info("Выполняется POST-запрос. Создание нового предмета.");
-        return service.createItem(userId, item);
+        return service.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@PathVariable int itemId, @RequestBody Item item, @RequestHeader("X-Sharer-User-Id") int userId) {
+    public ItemDto updateItem(@PathVariable int itemId, @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") int userId) {
         log.info("Выполняется PATCH-запрос. Обновление уже существующего предмета.");
-        return service.updateItem(itemId, item, userId);
+        return service.updateItem(itemId, itemDto, userId);
     }
 
     @GetMapping("/{itemId}")

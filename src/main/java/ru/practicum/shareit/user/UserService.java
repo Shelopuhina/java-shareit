@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 
@@ -15,16 +16,18 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public UserDto createUser(User user) {
-        return userStorage.createUser(user);
+    public UserDto createUser(UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
+        return UserMapper.toUserDto(userStorage.createUser(user));
     }
 
     public void deleteUser(int id) {
         userStorage.deleteUser(id);
     }
 
-    public UserDto updateUser(int id, User user) {
-        return userStorage.updateUser(id, user);
+    public UserDto updateUser(int id, UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
+        return UserMapper.toUserDto(userStorage.updateUser(id, user));
     }
 
     public List<User> getAllUsers() {
@@ -32,7 +35,7 @@ public class UserService {
     }
 
     public UserDto getUserById(int id) {
-        return userStorage.getUserById(id);
+        return UserMapper.toUserDto(userStorage.getUserById(id));
     }
 }
 

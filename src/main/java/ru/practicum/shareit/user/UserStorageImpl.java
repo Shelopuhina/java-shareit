@@ -3,8 +3,6 @@ package ru.practicum.shareit.user;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.DuplicationEmailException;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
@@ -18,12 +16,12 @@ public class UserStorageImpl implements UserStorage {
     private int nextId = 1;
 
     @Override
-    public UserDto createUser(User user) {
+    public User createUser(User user) {
         checkDuplicateUser(user);
         user.setId(nextId);
         nextId++;
         users.put(user.getId(), user);
-        return UserMapper.toUserDto(user);
+        return user;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class UserStorageImpl implements UserStorage {
     }
 
     @Override
-    public UserDto updateUser(int id, User userToUpdate) {
+    public User updateUser(int id, User userToUpdate) {
         if (users.containsKey(id)) {
             userToUpdate.setId(id);
             User oldUser = users.get(userToUpdate.getId());
@@ -46,16 +44,15 @@ public class UserStorageImpl implements UserStorage {
             checkDuplicateUser(userToUpdate);
 
             users.put(id, userToUpdate);
-            return UserMapper.toUserDto(userToUpdate);
+            return userToUpdate;
         }
         throw new NotFoundException(String.format("Пользователь с id = %s не существует", id));
     }
 
     @Override
-    public UserDto getUserById(int id) {
+    public User getUserById(int id) {
         return users.values().stream().filter(user -> user.getId() == id)
                 .findFirst()
-                .map(UserMapper::toUserDto)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %s не существует", id)));
     }
 

@@ -12,4 +12,14 @@ public class ItemMapper {
                 .request(item.getRequest())
                 .build();
     }
+
+    public static Item toItem(ItemDto itemDto) {
+        return Item.builder()
+                .name(itemDto.getName())
+                .available(itemDto.getAvailable())
+                .description(itemDto.getDescription())
+                .id(itemDto.getId())
+                .request(itemDto.getRequest())
+                .build();
+    }
 }

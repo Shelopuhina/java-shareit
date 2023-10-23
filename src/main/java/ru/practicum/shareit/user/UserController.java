@@ -22,9 +22,9 @@ public class UserController {
 
 
     @PostMapping
-    public UserDto createUser(@Valid @RequestBody User user) {
+    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
         log.info("Выполняется POST-запрос. Создание пользователя.");
-        return service.createUser(user);
+        return service.createUser(userDto);
     }
 
 
@@ -36,9 +36,9 @@ public class UserController {
 
 
     @PatchMapping("/{id}")
-    public UserDto updateUser(@PathVariable int id, @RequestBody User user) {
+    public UserDto updateUser(@PathVariable int id, @RequestBody UserDto userDto) {
         log.info("Выполняется PATCH-запрос. Обновление пользователя.");
-        return service.updateUser(id, user);
+        return service.updateUser(id, userDto);
     }
 
 

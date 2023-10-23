@@ -1,36 +1,41 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.stereotype.Service;
-
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserStorage;
 
-
 import java.util.List;
+
 
 @Service
 public class ItemService {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
 
+
     public ItemService(ItemStorage itemStorage, UserStorage userStorage) {
         this.itemStorage = itemStorage;
         this.userStorage = userStorage;
     }
 
-    public ItemDto createItem(int userId, Item item) {
+    public ItemDto createItem(int userId, ItemDto itemDto) {
         userStorage.getUserById(userId);
-        return itemStorage.addItem(userId, item);
+        Item item = ItemMapper.toItem(itemDto);
+        item.setOwner(userId);
+        itemStorage.addItem(userId, item);
+        return ItemMapper.toItemDto(item);
     }
 
-    public ItemDto updateItem(int itemId, Item item, int userId) {
+    public ItemDto updateItem(int itemId, ItemDto itemDto, int userId) {
         userStorage.getUserById(userId);
-        return itemStorage.updateItem(itemId, item, userId);
+        Item item = ItemMapper.toItem(itemDto);
+        return ItemMapper.toItemDto(itemStorage.updateItem(itemId, item, userId));
     }
 
     public ItemDto getItemById(int itemId) {
-        return itemStorage.getItemById(itemId);
+        return ItemMapper.toItemDto(itemStorage.getItemById(itemId));
     }
 
     public List<Item> getItemsByUser(int userId) {
