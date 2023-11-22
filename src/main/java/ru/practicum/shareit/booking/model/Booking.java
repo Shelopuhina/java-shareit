@@ -32,7 +32,7 @@ public class Booking {
     @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user_booking")
+    @JoinColumn(name = "id_user_booker")
     private User booker;
     @Enumerated(EnumType.STRING)
     @Column(name = "status_booking")
