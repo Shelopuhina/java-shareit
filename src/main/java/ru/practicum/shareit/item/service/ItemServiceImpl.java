@@ -58,7 +58,6 @@ public class ItemServiceImpl implements ItemService {
         if (itemToUpdate.getDescription() == null) itemToUpdate.setDescription(oldItem.getDescription());
         if (itemToUpdate.getAvailable() == null) itemToUpdate.setAvailable(oldItem.getAvailable());
         itemToUpdate.setOwner(oldItem.getOwner());
-        itemToUpdate.setRequestId(oldItem.getRequestId());
         return ItemMapper.toItemDto(itemStorage.save(itemToUpdate));
     }
 

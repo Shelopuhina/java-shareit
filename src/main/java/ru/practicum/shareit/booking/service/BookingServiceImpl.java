@@ -54,6 +54,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingTimeException("Окончаниме бронирование не может совпадать с датой старта бронирования.");
 
         Booking booking = BookingMapper.dtoInToBooking(bookingDtoIn, user, item);
+
         booking.setItem(item);
         bookingStorage.save(booking);
         log.info("Добавлено бронирование {}", booking);

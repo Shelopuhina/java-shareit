@@ -38,6 +38,4 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id_owner")
     private User owner;
-    @Column(name = "request_id")
-    private Integer requestId;
 }
