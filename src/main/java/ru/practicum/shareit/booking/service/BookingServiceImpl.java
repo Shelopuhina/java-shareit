@@ -3,7 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.storage.BookingStorage;
+import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -11,11 +11,10 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exceptions.*;
-import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-
-import ru.practicum.shareit.user.storage.UserStorage;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -29,34 +28,32 @@ import static ru.practicum.shareit.booking.dto.BookingMapper.bookingToDtoOut;
 @Service
 @Slf4j
 public class BookingServiceImpl implements BookingService {
-    private final BookingStorage bookingStorage;
-    private final UserStorage userStorage;
-    private final ItemStorage itemStorage;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional//прописать трансы
     public BookingDtoOut createBooking(BookingDtoIn bookingDtoIn) {
-        int userId = bookingDtoIn.getBookerId();
-        Optional<User> userOpt = userStorage.findById(userId);
-        if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-        User user = userOpt.get();
         int itemId = bookingDtoIn.getItemId();
-        Optional<Item> itemOpt = itemStorage.findById(itemId);
+        Optional<Item> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isEmpty()) throw new NotFoundException("Вещь с id=" + itemId + " не найдена");
         Item item = itemOpt.get();
-        if (item.getOwner().getId() == userId)
-            throw new NotFoundException("Вещь может забронить любой пользователь, кроме владельца вещи.");
         if (!item.getAvailable())
             throw new UnavailableItemException("На данный момент вещь с id=" + itemId + " недоступна для бронирования.");
         if (!bookingDtoIn.getEnd().isAfter(bookingDtoIn.getStart()))
             throw new BookingTimeException("Окончаниме бронирование может быть только после даты старта бронирования.");
         if (bookingDtoIn.getStart().isEqual(bookingDtoIn.getEnd()))
             throw new BookingTimeException("Окончаниме бронирование не может совпадать с датой старта бронирования.");
-
+        int userId = bookingDtoIn.getBookerId();
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        User user = userOpt.get();
+        if (item.getOwner().getId() == userId)
+            throw new NotFoundException("Вещь может забронить любой пользователь, кроме владельца вещи.");
         Booking booking = BookingMapper.dtoInToBooking(bookingDtoIn, user, item);
-
         booking.setItem(item);
-        bookingStorage.save(booking);
+        bookingRepository.save(booking);
         log.info("Добавлено бронирование {}", booking);
         return bookingToDtoOut(booking);
     }
@@ -64,11 +61,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDtoOut approveBooking(int userId, int bookingId, Boolean approved) {
-        Optional<Booking> bookingOptional = bookingStorage.findByIdAndItemOwnerId(bookingId, userId);
+        Optional<Booking> bookingOptional = bookingRepository.findByIdAndItemOwnerId(bookingId, userId);
         if (bookingOptional.isEmpty())
             throw new NotFoundException("Бронирование с id=" + bookingId + " не найдено");
         Booking booking = bookingOptional.get();
-        Optional<User> userOptOwner = userStorage.findById(booking.getItem().getOwner().getId());
+        Optional<User> userOptOwner = userRepository.findById(booking.getItem().getOwner().getId());
         if (userOptOwner.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         User owner = userOptOwner.get();
         if (!(owner.getId() == userId))
@@ -80,16 +77,16 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
-        return bookingToDtoOut(bookingStorage.save(booking));
+        return bookingToDtoOut(bookingRepository.save(booking));
     }
 
 
     @Override
     @Transactional
     public BookingDtoOut getBookingById(int bookingId, int userId) {
-        Optional<User> userOpt = userStorage.findById(userId);
+        Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-        Optional<Booking> bookingOpt = bookingStorage.findById(bookingId);
+        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
         if (bookingOpt.isEmpty())
             throw new NotFoundException("Бронирование с id=" + bookingId + " не найдено");
         Booking booking = bookingOpt.get();
@@ -101,8 +98,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public List<BookingDtoOut> getUserBookings(int userId, String bookingState) {
-        Optional<User> userOpt = userStorage.findById(userId);
-        if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
         BookingState state;
         try {
             state = BookingState.valueOf(bookingState);
@@ -112,23 +109,23 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
         switch (state) {
             case PAST:
-                bookings = bookingStorage.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
                 break;
             case FUTURE:
-                bookings = bookingStorage.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
                 break;
             case CURRENT:
                 LocalDateTime now = LocalDateTime.now();
-                bookings = bookingStorage.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+                bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
                 break;
             case WAITING:
-                bookings = bookingStorage.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingStorage.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
                 break;
             default:
-                bookings = bookingStorage.findByBookerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId);
         }
 
         return bookings.stream()
@@ -139,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public List<BookingDtoOut> getOwnerBookings(int userId, String bookingState) {
-        Optional<User> userOpt = userStorage.findById(userId);
+        Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         BookingState state;
         try {
@@ -151,23 +148,23 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case FUTURE:
-                bookings = bookingStorage.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
                 break;
             case CURRENT:
                 LocalDateTime now = LocalDateTime.now();
-                bookings = bookingStorage.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+                bookings = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
                 break;
             case PAST:
-                bookings = bookingStorage.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
                 break;
             case WAITING:
-                bookings = bookingStorage.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingStorage.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
                 break;
             default:
-                bookings = bookingStorage.findByItemOwnerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
         }
 
         return bookings.stream()

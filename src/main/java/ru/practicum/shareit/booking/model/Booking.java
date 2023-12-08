@@ -38,4 +38,7 @@ public class Booking {
     @Column(name = "status_booking")
     private BookingStatus status;
 
+    public int compareTo(Booking booking) {
+        return booking.getEnd().compareTo(this.end);
+    }
 }

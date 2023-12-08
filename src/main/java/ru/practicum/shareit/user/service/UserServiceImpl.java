@@ -7,7 +7,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 
 import java.util.List;
@@ -15,15 +15,15 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public UserDto createUser(UserDto userDto) {
         try {
-            User savedUser = userStorage.save(UserMapper.toUser(userDto));
+            User savedUser = userRepository.save(UserMapper.toUser(userDto));
             return UserMapper.toUserDto(savedUser);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicationEmailException("пользователь " + userDto.getEmail() + " уже зарегестрирован.");
@@ -31,13 +31,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(int id) {
-        userStorage.deleteById(id);
+        userRepository.deleteById(id);
 
     }
 
     public UserDto updateUser(int id, UserDto userDto) {
         try {
-            Optional<User> userOpt = userStorage.findById(id);
+            Optional<User> userOpt = userRepository.findById(id);
             if (userOpt.isEmpty())
                 throw new NotFoundException("Пользователь с id=" + id + " не существует");
             User oldUser = userOpt.get();
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
             userToUpdate.setId(id);
             if (userToUpdate.getName() == null) userToUpdate.setName(oldUser.getName());
             if (userToUpdate.getEmail() == null) userToUpdate.setEmail(oldUser.getEmail());
-            User user = userStorage.save(userToUpdate);
+            User user = userRepository.save(userToUpdate);
             return UserMapper.toUserDto(user);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicationEmailException("пользователь " + userDto.getEmail() + " уже зарегестрирован.");
@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<User> getAllUsers() {
-        return userStorage.findAll();
+        return userRepository.findAll();
     }
 
     public UserDto getUserById(int id) {
-        Optional<User> userOpt = userStorage.findById(id);
+        Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + id + " не найден");
         return UserMapper.toUserDto(userOpt.get());
 

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookingStorage extends JpaRepository<Booking, Integer> {
+public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByBookerIdOrderByStartDesc(int id);
 
     List<Booking> findByBookerIdAndStartAfterOrderByStartDesc(int id, LocalDateTime localDateTime);
