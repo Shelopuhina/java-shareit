@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
@@ -18,17 +17,18 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({DuplicationEmailException.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicationExc(final RuntimeException e) {
         log.error(e.getMessage());
         return new ErrorResponse("Ошибка дублирования поля email пользователя.", e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({BookingStateException.class, BookingStatusException.class, UnavailableItemException.class,
+            BookingErrorException.class, BookingTimeException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleThrowable(final Throwable e) {
-        log.info("500 {}", e.getMessage(), e);
-        return new ErrorResponse("Сервер столкнулся с неожиданной ошибкой, которая помешала ему выполнить запрос.", e.getMessage());
+        log.info(e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
-
 }
+

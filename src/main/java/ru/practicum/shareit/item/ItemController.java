@@ -3,8 +3,10 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -32,13 +34,14 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable int itemId) {
+    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") int userId,
+                           @PathVariable int itemId) {
         log.info("Выполняется GET-запрос. Получение уже существующего предмета.");
-        return service.getItemById(itemId);
+        return service.getItemById(itemId, userId);
     }
 
     @GetMapping
-    public List<Item> getItemByUser(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public List<ItemDto> getItemByUser(@RequestHeader("X-Sharer-User-Id") int userId) {
         log.info("Выполняется GET-запрос. Получение предметов пользователя.");
         return service.getItemsByUser(userId);
     }
@@ -47,5 +50,12 @@ public class ItemController {
     public List<Item> searchItem(@RequestParam("text") String description) {
         log.info("Выполняется GET-запрос. Получение предмета по ключевым словам.");
         return service.searchItem(description);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") int userId,
+                                 @PathVariable int itemId,
+                                 @RequestBody @Valid CommentDto commentDto) {
+        return service.addComment(userId, itemId, commentDto);
     }
 }
