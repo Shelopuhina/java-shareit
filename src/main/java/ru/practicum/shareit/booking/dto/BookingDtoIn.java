@@ -26,5 +26,5 @@ public class BookingDtoIn {
     @NotNull
     private final int itemId;
     private int bookerId;
-    private final BookingStatus status = BookingStatus.WAITING;
+    private BookingStatus status = BookingStatus.WAITING;
 }

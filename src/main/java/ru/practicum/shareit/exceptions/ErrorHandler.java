@@ -24,7 +24,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({BookingStateException.class, BookingStatusException.class, UnavailableItemException.class,
-            BookingErrorException.class, BookingTimeException.class})
+            BookingErrorException.class, BookingTimeException.class, InvalidDataException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleThrowable(final Throwable e) {
         log.info(e.getMessage());

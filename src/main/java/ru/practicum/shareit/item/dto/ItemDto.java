@@ -15,10 +15,8 @@ import java.util.List;
 @Builder
 public class ItemDto {
     private int id;
-    @NotNull
     @NotEmpty
     private String name;
-    @NotNull
     @NotEmpty
     private String description;
     @NotNull

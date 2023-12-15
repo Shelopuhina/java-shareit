@@ -1,10 +1,13 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exceptions.BookingTimeException;
+import ru.practicum.shareit.exceptions.InvalidDataException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentMapper;
 import ru.practicum.shareit.item.model.Comment;
@@ -15,6 +18,8 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -31,13 +36,23 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
 
     public ItemDto createItem(int userId, ItemDto itemDto) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         User user = userOpt.get();
-        Item item = ItemMapper.toItem(itemDto);
+
+        ItemRequest itemRequest = null;
+        Integer requestId = itemDto.getRequestId();
+        if (requestId != null) {
+            Optional<ItemRequest> itemRequestOpt = itemRequestRepository.findById(requestId);
+            if (itemRequestOpt.isEmpty())
+                throw new NotFoundException("Запрос с id=" + requestId + " не найден");
+            itemRequest = itemRequestOpt.get();
+        }
+        Item item = ItemMapper.toItemReq(itemDto, itemRequest);
         item.setOwner(user);
         itemRepository.save(item);
         return ItemMapper.toItemDto(item);
@@ -50,7 +65,15 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isEmpty()) throw new NotFoundException("Item с id=" + itemId + " не найден");
         Item oldItem = itemOpt.get();
-        Item itemToUpdate = ItemMapper.toItem(itemDto);
+        ItemRequest itemRequest = null;
+        Integer requestId = itemDto.getRequestId();
+        if (requestId != null) {
+            Optional<ItemRequest> itemRequestOpt = itemRequestRepository.findById(requestId);
+            if (itemRequestOpt.isEmpty())
+                throw new NotFoundException("Запрос с id=" + requestId + " не найден");
+            itemRequest = itemRequestOpt.get();
+        }
+        Item itemToUpdate = ItemMapper.toItemReq(itemDto,itemRequest);
         if (oldItem.getOwner().getId() != userId)
             throw new NotFoundException(String.format("У предмета с id=" + itemId + " не совпадает id владельца =" + userId));
         itemToUpdate.setId(itemId);
@@ -58,6 +81,8 @@ public class ItemServiceImpl implements ItemService {
         if (itemToUpdate.getDescription() == null) itemToUpdate.setDescription(oldItem.getDescription());
         if (itemToUpdate.getAvailable() == null) itemToUpdate.setAvailable(oldItem.getAvailable());
         itemToUpdate.setOwner(oldItem.getOwner());
+
+
         return ItemMapper.toItemDto(itemRepository.save(itemToUpdate));
     }
 
@@ -84,10 +109,10 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDtoComplex(item, last, next, comms);
     }
 
-    public List<ItemDto> getItemsByUser(int userId) {
+    public List<ItemDto> getItemsByUser(int userId, int from, int size) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-        List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
+        List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(userId,getPageable(from,size));
         List<Comment> comms = commentRepository.findAll();
         List<Booking> bookings = bookingRepository.findAll();
         List<ItemDto> sortedItems = new ArrayList<>();
@@ -98,9 +123,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    public List<Item> searchItem(String text) {
+    public List<Item> searchItem(String text, int from, int size) {
         if (text.isBlank()) return new ArrayList<>();
-        List<ItemDto> itemsFound = itemRepository.search(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<ItemDto> itemsFound = itemRepository.search(text, getPageable(from,size)).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         return itemsFound.stream().map(ItemMapper::toItem).collect(Collectors.toList());
 
 
@@ -137,6 +162,13 @@ public class ItemServiceImpl implements ItemService {
                 .map(CommentMapper::commentToDto)
                 .collect(Collectors.toList());
         return ItemMapper.toItemDtoComplex(item, last, next, comms);
+    }
+    private Pageable getPageable(int from, int size) {
+        if (from < 0 || size < 1) {
+            throw new InvalidDataException("size и from поля должны соответсвовать значениям.");
+        }
+        int page = from / size;
+        return PageRequest.of(page, size);
     }
 }
 
