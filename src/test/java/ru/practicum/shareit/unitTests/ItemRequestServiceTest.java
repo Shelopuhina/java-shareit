@@ -91,7 +91,7 @@ public class ItemRequestServiceTest {
                 .thenReturn(Optional.of(user));
         Mockito
                 .when(itemRequestRepository.findByRequestorIdOrderByCreatedDesc(anyInt()))
-                .thenReturn(List.of(ItemRequestMapper.FromDto(itemRequestDto, user)));
+                .thenReturn(List.of(ItemRequestMapper.fromDto(itemRequestDto, user)));
         Mockito
                 .when(itemRepository.findByRequestId(anyInt()))
                 .thenReturn(Collections.emptyList());
@@ -127,7 +127,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(anyInt(), any(Pageable.class)))
                 .thenReturn(
-                        List.of(ItemRequestMapper.FromDto(itemRequestDto, user)));
+                        List.of(ItemRequestMapper.fromDto(itemRequestDto, user)));
 
         List<ItemRequestDto> itemRequests = itemRequestService.getAllItemRequests(1, 0, 5);
         ItemRequestDto itemRequestDto1 = itemRequests.get(0);
@@ -160,7 +160,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(itemRequestRepository.findById(anyInt()))
                 .thenReturn(
-                        Optional.of(ItemRequestMapper.FromDto(itemRequestDto, user))
+                        Optional.of(ItemRequestMapper.fromDto(itemRequestDto, user))
                 );
 
         ItemRequestDto itemRequestDto1 = itemRequestService.getItemRequestById(1, 1);
