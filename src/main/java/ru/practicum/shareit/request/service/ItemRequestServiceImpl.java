@@ -32,8 +32,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto addItemRequest(int userId, ItemRequestDto itemRequestDto) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-        ItemRequest itemRequest = itemRequestRepository.save(ItemRequestMapper.FromDto(itemRequestDto, userOpt.get()));
-        return ItemRequestMapper.ToDto(itemRequest);
+        ItemRequest itemRequest = itemRequestRepository.save(ItemRequestMapper.fromDto(itemRequestDto, userOpt.get()));
+        return ItemRequestMapper.toDto(itemRequest);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         List<ItemRequestDto> itReqs = itemRequestRepository.findByRequestorIdOrderByCreatedDesc(userId).stream()
                 .peek(itemRequest -> itemRequest.setItems(itemRepository.findByRequestId(itemRequest.getId())))
-                .map(ItemRequestMapper::ToDto)
+                .map(ItemRequestMapper::toDto)
                 .collect(Collectors.toList());
         for (ItemRequestDto itReq : itReqs) {
             List<ItemDto> itD = itReq.getItems().stream().peek(itemDto -> itemDto.setRequestId(itReq.getId())).collect(Collectors.toList());
@@ -60,7 +60,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         Pageable pageable = PageRequest.of(from / size, size);
         List<ItemRequest> allItemRequest = itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId, pageable);
-        List<ItemRequestDto> newItemReqDto = allItemRequest.stream().map(ItemRequestMapper::ToDto).collect(Collectors.toList());
+        List<ItemRequestDto> newItemReqDto = allItemRequest.stream().map(ItemRequestMapper::toDto).collect(Collectors.toList());
         for (ItemRequestDto itReq : newItemReqDto) {
             List<ItemDto> itD = itReq.getItems().stream().peek(itemDto -> itemDto.setRequestId(itReq.getId())).collect(Collectors.toList());
             itReq.setItems(itD);
@@ -74,7 +74,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         Optional<ItemRequest> itemRequestOptional = itemRequestRepository.findById(requestId);
         if (itemRequestOptional.isEmpty()) throw new NotFoundException("Запрос с id=" + requestId + " не найден");
-        ItemRequestDto itemRequest = ItemRequestMapper.ToDto(itemRequestOptional.get());
+        ItemRequestDto itemRequest = ItemRequestMapper.toDto(itemRequestOptional.get());
         List<ItemDto> itD = itemRequest.getItems().stream().peek(itemDto -> itemDto.setRequestId(itemRequest.getId())).collect(Collectors.toList());
         itemRequest.setItems(itD);
         return itemRequest;
