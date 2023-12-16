@@ -23,9 +23,9 @@ import java.util.List;
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="request_id")
+    @Column(name = "request_id")
     private Integer id;
-    @Column(name ="request_description")
+    @Column(name = "request_description")
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requestor_id")

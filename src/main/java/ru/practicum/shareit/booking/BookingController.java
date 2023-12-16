@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -50,7 +49,7 @@ public class BookingController {
                                                @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение списка всех бронирований текущего пользователя.");
-        return bookingService.getUserBookings(userId, state,from, size);
+        return bookingService.getUserBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")

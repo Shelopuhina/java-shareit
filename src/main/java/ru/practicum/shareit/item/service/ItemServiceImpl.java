@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
                 throw new NotFoundException("Запрос с id=" + requestId + " не найден");
             itemRequest = itemRequestOpt.get();
         }
-        Item itemToUpdate = ItemMapper.toItemReq(itemDto,itemRequest);
+        Item itemToUpdate = ItemMapper.toItemReq(itemDto, itemRequest);
         if (oldItem.getOwner().getId() != userId)
             throw new NotFoundException(String.format("У предмета с id=" + itemId + " не совпадает id владельца =" + userId));
         itemToUpdate.setId(itemId);
@@ -112,7 +112,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getItemsByUser(int userId, int from, int size) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-        List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(userId,getPageable(from,size));
+        List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(userId, getPageable(from, size));
         List<Comment> comms = commentRepository.findAll();
         List<Booking> bookings = bookingRepository.findAll();
         List<ItemDto> sortedItems = new ArrayList<>();
@@ -125,7 +125,7 @@ public class ItemServiceImpl implements ItemService {
 
     public List<Item> searchItem(String text, int from, int size) {
         if (text.isBlank()) return new ArrayList<>();
-        List<ItemDto> itemsFound = itemRepository.search(text, getPageable(from,size)).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<ItemDto> itemsFound = itemRepository.search(text, getPageable(from, size)).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         return itemsFound.stream().map(ItemMapper::toItem).collect(Collectors.toList());
 
 
@@ -163,6 +163,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
         return ItemMapper.toItemDtoComplex(item, last, next, comms);
     }
+
     private Pageable getPageable(int from, int size) {
         if (from < 0 || size < 1) {
             throw new InvalidDataException("size и from поля должны соответсвовать значениям.");

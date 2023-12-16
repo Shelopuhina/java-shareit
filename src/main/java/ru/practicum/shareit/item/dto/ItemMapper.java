@@ -46,13 +46,14 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .id(item.getId())
                 .build();
-        if(!(item.getRequest() == null)) {
-           itemDto.setRequestId(item.getRequest().getId());
-        }else{
+        if (!(item.getRequest() == null)) {
+            itemDto.setRequestId(item.getRequest().getId());
+        } else {
             itemDto.setRequestId(null);
         }
         return itemDto;
     }
+
     public static Item itemFromDto(ItemDto itemDto, User user, ItemRequest itemRequest) {
         return Item.builder()
                 .id(itemDto.getId())
@@ -63,7 +64,8 @@ public class ItemMapper {
                 .available(itemDto.getAvailable())
                 .build();
     }
-    public static Item toItemReq(ItemDto itemDto,ItemRequest itemRequest) {
+
+    public static Item toItemReq(ItemDto itemDto, ItemRequest itemRequest) {
         return Item.builder()
                 .name(itemDto.getName())
                 .available(itemDto.getAvailable())
@@ -72,7 +74,8 @@ public class ItemMapper {
                 .request(itemRequest)
                 .build();
     }
-    public static ItemDto toItemDtoComplexReqId(Item item, Booking lastBooking, Booking nextbooking, List<CommentDto> comments,ItemRequest itemRequest) {
+
+    public static ItemDto toItemDtoComplexReqId(Item item, Booking lastBooking, Booking nextbooking, List<CommentDto> comments, ItemRequest itemRequest) {
         ItemDto itemDto = ItemDto.builder()
                 .name(item.getName())
                 .available(item.getAvailable())

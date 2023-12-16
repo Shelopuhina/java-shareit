@@ -113,7 +113,7 @@ public class ItemServiceTest {
                 .then(returnsFirstArg());
 
 
-        ItemDto itemDto = itemService.createItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest));
+        ItemDto itemDto = itemService.createItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest));
         Assertions.assertAll("Проверка создания вещи: ",
                 () -> assertEquals(itemDto.getId(), item.getId()),
                 () -> assertEquals(itemDto.getName(), item.getName()),
@@ -133,9 +133,9 @@ public class ItemServiceTest {
 
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.createItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest)));
+                () -> itemService.createItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest)));
 
-        Assertions.assertEquals(e.getMessage(),"Пользователь с id=1 не найден");
+        Assertions.assertEquals(e.getMessage(), "Пользователь с id=1 не найден");
     }
 
     @Test
@@ -149,9 +149,9 @@ public class ItemServiceTest {
 
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.createItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest)));
+                () -> itemService.createItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest)));
 
-        Assertions.assertEquals(e.getMessage(),"Запрос с id=1 не найден");
+        Assertions.assertEquals(e.getMessage(), "Запрос с id=1 не найден");
     }
 
     @Test
@@ -169,7 +169,7 @@ public class ItemServiceTest {
                 .when(itemRepository.save(any(Item.class)))
                 .then(returnsFirstArg());
 
-        ItemDto itemDto = itemService.updateItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest),2);
+        ItemDto itemDto = itemService.updateItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest), 2);
 
         Assertions.assertAll("Проверка обновления вещи: ",
                 () -> assertEquals(itemDto.getId(), item.getId()),
@@ -193,10 +193,10 @@ public class ItemServiceTest {
 
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.updateItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest),2)
+                () -> itemService.updateItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest), 2)
         );
 
-        Assertions.assertEquals(e.getMessage(),"Item с id=1 не найден");
+        Assertions.assertEquals(e.getMessage(), "Item с id=1 не найден");
     }
 
     @Test
@@ -212,10 +212,10 @@ public class ItemServiceTest {
                 .thenReturn(Optional.of(item));
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.updateItem(1,ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest),1)
+                () -> itemService.updateItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest), 1)
         );
 
-        Assertions.assertEquals(e.getMessage(),"У предмета с id=1 не совпадает id владельца =1");
+        Assertions.assertEquals(e.getMessage(), "У предмета с id=1 не совпадает id владельца =1");
     }
 
     @Test
@@ -232,10 +232,10 @@ public class ItemServiceTest {
 
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.updateItem(1,ItemMapper.toItemDtoComplexReqId(item, null, null, null,itemRequest),1)
+                () -> itemService.updateItem(1, ItemMapper.toItemDtoComplexReqId(item, null, null, null, itemRequest), 1)
         );
 
-        Assertions.assertEquals(e.getMessage(),"Запрос с id=1 не найден");
+        Assertions.assertEquals(e.getMessage(), "Запрос с id=1 не найден");
     }
 
     @Test
@@ -255,8 +255,8 @@ public class ItemServiceTest {
                 () -> assertEquals(itemDto.getAvailable(), item.getAvailable()),
                 () -> assertNull(itemDto.getLastBooking()),
                 () -> assertNull(itemDto.getNextBooking()),
-                () -> assertEquals(itemDto.getComments().size(),1),
-                () -> assertEquals(itemDto.getComments().get(0).getId(),comment.getId()));
+                () -> assertEquals(itemDto.getComments().size(), 1),
+                () -> assertEquals(itemDto.getComments().get(0).getId(), comment.getId()));
     }
 
     @Test
@@ -270,7 +270,7 @@ public class ItemServiceTest {
                 () -> itemService.getItemById(1, 1)
         );
 
-        Assertions.assertEquals(e.getMessage(),"Item с id=1 не найден");
+        Assertions.assertEquals(e.getMessage(), "Item с id=1 не найден");
     }
 
     @Test
@@ -306,7 +306,7 @@ public class ItemServiceTest {
                 () -> itemService.getItemsByUser(1, 0, 5)
         );
 
-        Assertions.assertEquals(e.getMessage(),"Пользователь с id=1 не найден");
+        Assertions.assertEquals(e.getMessage(), "Пользователь с id=1 не найден");
     }
 
 
@@ -373,7 +373,7 @@ public class ItemServiceTest {
 
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.addComment(1, 1,  CommentMapper.commentToDto(comment)));
+                () -> itemService.addComment(1, 1, CommentMapper.commentToDto(comment)));
 
         Assertions.assertEquals(e.getMessage(), "Пользователь с id=1 не найден");
     }
@@ -387,9 +387,9 @@ public class ItemServiceTest {
                 .when(itemRepository.findById(anyInt()))
                 .thenReturn(Optional.empty());
 
-       NotFoundException e = Assertions.assertThrows(
+        NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> itemService.addComment(1, 1,  CommentMapper.commentToDto(comment)));
+                () -> itemService.addComment(1, 1, CommentMapper.commentToDto(comment)));
 
         Assertions.assertEquals(e.getMessage(), "Вещь с id=1 не найдена");
     }
