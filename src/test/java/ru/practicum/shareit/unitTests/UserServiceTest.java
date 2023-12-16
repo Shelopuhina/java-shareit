@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +55,7 @@ public class UserServiceTest {
                 () -> assertEquals(userDto.getName(), user.getName()),
                 () -> assertEquals(userDto.getEmail(), user.getEmail()));
 
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
@@ -66,6 +69,7 @@ public class UserServiceTest {
                 () -> userService.createUser(UserMapper.toUserDto(user)));
 
         Assertions.assertEquals(e.getMessage(), "пользователь user@email.com уже зарегестрирован.");
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
@@ -82,6 +86,8 @@ public class UserServiceTest {
                 () -> assertEquals(userDto.getId(), user.getId()),
                 () -> assertEquals(userDto.getName(), user.getName()),
                 () -> assertEquals(userDto.getEmail(), user.getEmail()));
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).findById(anyInt());
     }
 
     @Test
@@ -96,6 +102,7 @@ public class UserServiceTest {
         );
 
         Assertions.assertEquals(e.getMessage(), "Пользователь с id=1 не существует");
+        verify(userRepository, times(1)).findById(anyInt());
     }
 
     @Test
@@ -113,6 +120,8 @@ public class UserServiceTest {
         );
 
         Assertions.assertEquals(e.getMessage(), "пользователь user@email.com уже зарегестрирован.");
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).findById(anyInt());
     }
 
     @Test
@@ -126,6 +135,7 @@ public class UserServiceTest {
                 () -> assertEquals(userDto.getId(), user.getId()),
                 () -> assertEquals(userDto.getName(), user.getName()),
                 () -> assertEquals(userDto.getEmail(), user.getEmail()));
+        verify(userRepository, times(1)).findById(anyInt());
     }
 
     @Test
@@ -140,6 +150,7 @@ public class UserServiceTest {
         );
 
         Assertions.assertEquals(e.getMessage(), "Пользователь с id=1 не найден");
+        verify(userRepository, times(1)).findById(anyInt());
     }
 
     @Test
@@ -155,6 +166,7 @@ public class UserServiceTest {
                 () -> assertEquals(user1.getId(), user.getId()),
                 () -> assertEquals(user1.getName(), user.getName()),
                 () -> assertEquals(user1.getEmail(), user.getEmail()));
+        verify(userRepository, times(1)).findAll();
     }
 }
 

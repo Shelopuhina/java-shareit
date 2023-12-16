@@ -22,12 +22,15 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.util.PageUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.util.PageUtils.getPageable;
 
 @Service
 @RequiredArgsConstructor
@@ -164,12 +167,5 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDtoComplex(item, last, next, comms);
     }
 
-    private Pageable getPageable(int from, int size) {
-        if (from < 0 || size < 1) {
-            throw new InvalidDataException("size и from поля должны соответсвовать значениям.");
-        }
-        int page = from / size;
-        return PageRequest.of(page, size);
-    }
 }
 

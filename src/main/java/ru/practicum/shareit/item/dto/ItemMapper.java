@@ -40,18 +40,13 @@ public class ItemMapper {
     }
 
     public static ItemDto toItemDto(Item item) {
-        ItemDto itemDto = ItemDto.builder()
+        return ItemDto.builder()
                 .name(item.getName())
                 .available(item.getAvailable())
                 .description(item.getDescription())
                 .id(item.getId())
+                .requestId(item.getRequest() == null ? null : item.getRequest().getId())
                 .build();
-        if (!(item.getRequest() == null)) {
-            itemDto.setRequestId(item.getRequest().getId());
-        } else {
-            itemDto.setRequestId(null);
-        }
-        return itemDto;
     }
 
     public static Item itemFromDto(ItemDto itemDto, User user, ItemRequest itemRequest) {

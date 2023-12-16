@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.booking.dto.BookingMapper.bookingToDtoOut;
+import static ru.practicum.shareit.util.PageUtils.getPageable;
 
 @RequiredArgsConstructor
 @Service
@@ -180,13 +181,5 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::bookingToDtoOut)
                 .collect(Collectors.toList());
 
-    }
-
-    private Pageable getPageable(int from, int size) {
-        if (from < 0 || size < 1) {
-            throw new InvalidDataException("size и from поля должны соответсвовать значениям.");
-        }
-        int page = from / size;
-        return PageRequest.of(page, size);
     }
 }
