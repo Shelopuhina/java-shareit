@@ -8,6 +8,8 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -43,16 +45,20 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingDtoOut> getUserBookings(@RequestHeader("X-Sharer-User-Id") int userId,
-                                               @RequestParam(defaultValue = "ALL") String state) {
+                                               @RequestParam(defaultValue = "ALL") String state,
+                                               @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+                                               @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение списка всех бронирований текущего пользователя.");
-        return bookingService.getUserBookings(userId, state);
+        return bookingService.getUserBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoOut> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") int userId,
-                                                @RequestParam(defaultValue = "ALL") String state) {
+                                                @RequestParam(defaultValue = "ALL") String state,
+                                                @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+                                                @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение списка бронирований для всех вещей текущего пользователя.");
-        return bookingService.getOwnerBookings(userId, state);
+        return bookingService.getOwnerBookings(userId, state, from, size);
     }
 
 }

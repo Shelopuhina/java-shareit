@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.booking.dto.BookingMapper.bookingToDtoOut;
+import static ru.practicum.shareit.util.PageUtils.getPageable;
 
 @RequiredArgsConstructor
 @Service
@@ -53,6 +54,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Вещь может забронить любой пользователь, кроме владельца вещи.");
         Booking booking = BookingMapper.dtoInToBooking(bookingDtoIn, user, item);
         booking.setItem(item);
+        booking.setStatus(BookingStatus.WAITING);
         bookingRepository.save(booking);
         log.info("Добавлено бронирование {}", booking);
         return bookingToDtoOut(booking);
@@ -97,9 +99,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public List<BookingDtoOut> getUserBookings(int userId, String bookingState) {
+    public List<BookingDtoOut> getUserBookings(int userId, String bookingState, int from, int size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
+        if (from < 0 || size < 1) {
+            throw new InvalidDataException("size и from поля должны соответсвовать значениям.");
+        }
         BookingState state;
         try {
             state = BookingState.valueOf(bookingState);
@@ -109,23 +114,23 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), getPageable(from, size));
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(), getPageable(from, size));
                 break;
             case CURRENT:
                 LocalDateTime now = LocalDateTime.now();
-                bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+                bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now, getPageable(from, size));
                 break;
             case WAITING:
-                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING, getPageable(from, size));
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED, getPageable(from, size));
                 break;
             default:
-                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId, getPageable(from, size));
         }
 
         return bookings.stream()
@@ -135,9 +140,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public List<BookingDtoOut> getOwnerBookings(int userId, String bookingState) {
+    public List<BookingDtoOut> getOwnerBookings(int userId, String bookingState, int from, int size) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        if (from < 0 || size < 1) {
+            throw new InvalidDataException("size и from поля должны соответсвовать значениям.");
+        }
         BookingState state;
         try {
             state = BookingState.valueOf(bookingState);
@@ -148,23 +156,23 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case FUTURE:
-                bookings = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(), getPageable(from, size));
                 break;
             case CURRENT:
                 LocalDateTime now = LocalDateTime.now();
-                bookings = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+                bookings = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now, getPageable(from, size));
                 break;
             case PAST:
-                bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), getPageable(from, size));
                 break;
             case WAITING:
-                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING, getPageable(from, size));
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED, getPageable(from, size));
                 break;
             default:
-                bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId, getPageable(from, size));
         }
 
         return bookings.stream()
