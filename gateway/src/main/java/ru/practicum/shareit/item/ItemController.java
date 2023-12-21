@@ -57,7 +57,7 @@ public class ItemController {
                                  @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                  @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение предмета по ключевым словам.");
-        return itemClient.searchItem(userId, description, from, size);
+        return itemClient.searchItem(description, from, size,userId);
     }
 
     @PostMapping("/{itemId}/comment")

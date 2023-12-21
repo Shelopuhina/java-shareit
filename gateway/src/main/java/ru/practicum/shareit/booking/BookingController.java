@@ -43,24 +43,19 @@ public class BookingController {
 
     @GetMapping()
     public ResponseEntity<Object> getUserBookings(@RequestHeader("X-Sharer-User-Id") int userId,
-                                                  @RequestParam(defaultValue = "ALL") String stateParam,
+                                                  @RequestParam(defaultValue = "ALL") String state,
                                                   @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                   @RequestParam(defaultValue = "10") @Positive int size) {
 
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-        log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
         return bookingClient.getUserBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public ResponseEntity<Object>    getOwnerBookings(@RequestHeader("X-Sharer-User-Id") int userId,
-                                                @RequestParam(defaultValue = "ALL") String stateParam,
+                                                @RequestParam(defaultValue = "ALL") String state,
                                                 @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                 @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение списка бронирований для всех вещей текущего пользователя.");
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         return bookingClient.getOwnerBookings(userId, state, from, size);
     }
 

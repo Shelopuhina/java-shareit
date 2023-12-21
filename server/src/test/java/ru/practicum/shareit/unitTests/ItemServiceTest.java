@@ -316,7 +316,7 @@ public class ItemServiceTest {
                 .when(itemRepository.search(any(String.class), any(Pageable.class)))
                 .thenReturn(List.of(item));
 
-        List<Item> items = itemService.searchItem("text", 0, 5);
+        List<Item> items = itemService.searchItem("text", 0, 5,1);
         Item itemDto = items.get(0);
         Assertions.assertAll("Проверка поиска вещей : ",
                 () -> assertEquals(items.size(), 1),
@@ -328,7 +328,7 @@ public class ItemServiceTest {
 
     @Test
     public void shouldNotSearchItemsWhenBlankText() {
-        List<Item> items = itemService.searchItem("", 0, 5);
+        List<Item> items = itemService.searchItem("", 0, 5,1);
 
         Assertions.assertEquals(0, (items.size()));
     }

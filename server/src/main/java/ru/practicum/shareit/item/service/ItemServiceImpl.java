@@ -123,7 +123,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    public List<Item> searchItem(String text, int from, int size) {
+    public List<Item> searchItem(String text, int from, int size,int userId) {
         if (text.isBlank()) return new ArrayList<>();
         List<ItemDto> itemsFound = itemRepository.search(text, getPageable(from, size)).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         return itemsFound.stream().map(ItemMapper::toItem).collect(Collectors.toList());

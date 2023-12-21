@@ -11,6 +11,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.BaseClient;
 import ru.practicum.shareit.booking.model.BookingDtoIn;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.exceptions.BookingStateException;
 
 import java.util.Map;
 
@@ -41,11 +42,16 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookingById(int userId, int bookingId) {
+    public ResponseEntity<Object> getBookingById(int bookingId,int userId) {
         return get("/" + bookingId, userId, null);
     }
 
-    public ResponseEntity<Object> getUserBookings(int userId, BookingState state, int from, int size) {
+    public ResponseEntity<Object> getUserBookings(int userId, String state, int from, int size) {
+        try {
+            BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new BookingStateException("Unknown state: " + state);
+        }
         Map<String, Object> parameters = Map.of(
                 "state", state,
                 "from", from,
@@ -54,7 +60,12 @@ public class BookingClient extends BaseClient {
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getOwnerBookings(int userId, BookingState state, int from, int size) {
+    public ResponseEntity<Object> getOwnerBookings(int userId,String state, int from, int size) {
+        try {
+            BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new BookingStateException("Unknown state: " + state);
+        }
         Map<String, Object> parameters = Map.of(
                 "state", state,
                 "from", from,

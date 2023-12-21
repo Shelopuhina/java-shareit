@@ -8,9 +8,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -52,11 +49,12 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<Item> searchItem(@RequestParam("text") String description,
+    public List<Item> searchItem(@RequestHeader("X-Sharer-User-Id") int userId,
+                                 @RequestParam("text") String description,
                                  @RequestParam(name = "from", defaultValue = "0")  Integer from,
                                  @RequestParam(defaultValue = "10") int size) {
         log.info("Выполняется GET-запрос. Получение предмета по ключевым словам.");
-        return service.searchItem(description, from, size);
+        return service.searchItem(description, from, size,userId);
     }
 
     @PostMapping("/{itemId}/comment")

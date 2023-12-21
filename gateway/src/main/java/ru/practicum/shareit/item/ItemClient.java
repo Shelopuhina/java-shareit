@@ -31,7 +31,7 @@ public class ItemClient extends BaseClient {
     public ResponseEntity<Object> createItem(int userId, ItemDto itemDto) {
         return post("", userId, itemDto);
     }
-    public ResponseEntity<Object> getItemById(int userId, int itemId) {
+    public ResponseEntity<Object> getItemById(int itemId,int userId) {
         return get("/" + itemId, userId, null);
     }
 
@@ -49,7 +49,7 @@ public class ItemClient extends BaseClient {
         return patch("/" + itemId, userId, null, itemDto);
     }
 
-    public ResponseEntity<Object> searchItem(int userId, String text, int from, int size) {
+    public ResponseEntity<Object> searchItem(String text, int from, int size,int userId) {
         Map<String, Object> parameters = Map.of(
                 "text", text,
                 "from", from,

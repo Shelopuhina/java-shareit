@@ -115,7 +115,7 @@ public class ItemControllerTest {
     @Test
     public void shouldSearchItems() throws Exception {
         Mockito
-                .when(itemService.searchItem(anyString(), anyInt(), anyInt()))
+                .when(itemService.searchItem(anyString(), anyInt(), anyInt(),anyInt()))
                 .thenReturn(List.of(ItemMapper.toItem(itemDto)));
 
         mvc.perform(get("/items/search")
