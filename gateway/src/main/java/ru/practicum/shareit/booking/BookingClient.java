@@ -42,7 +42,7 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookingById(int bookingId,int userId) {
+    public ResponseEntity<Object> getBookingById(int bookingId, int userId) {
         return get("/" + bookingId, userId, null);
     }
 
@@ -60,7 +60,7 @@ public class BookingClient extends BaseClient {
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getOwnerBookings(int userId,String state, int from, int size) {
+    public ResponseEntity<Object> getOwnerBookings(int userId, String state, int from, int size) {
         try {
             BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {

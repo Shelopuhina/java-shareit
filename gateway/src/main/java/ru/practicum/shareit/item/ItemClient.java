@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item;
 
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -28,10 +28,12 @@ public class ItemClient extends BaseClient {
                         .build()
         );
     }
+
     public ResponseEntity<Object> createItem(int userId, ItemDto itemDto) {
         return post("", userId, itemDto);
     }
-    public ResponseEntity<Object> getItemById(int itemId,int userId) {
+
+    public ResponseEntity<Object> getItemById(int itemId, int userId) {
         return get("/" + itemId, userId, null);
     }
 
@@ -44,12 +46,11 @@ public class ItemClient extends BaseClient {
     }
 
 
-
-    public ResponseEntity<Object> updateItem( int itemId, ItemDto itemDto, int userId) {
+    public ResponseEntity<Object> updateItem(int itemId, ItemDto itemDto, int userId) {
         return patch("/" + itemId, userId, null, itemDto);
     }
 
-    public ResponseEntity<Object> searchItem(String text, int from, int size,int userId) {
+    public ResponseEntity<Object> searchItem(String text, int from, int size, int userId) {
         Map<String, Object> parameters = Map.of(
                 "text", text,
                 "from", from,

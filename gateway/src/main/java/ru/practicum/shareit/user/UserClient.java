@@ -1,4 +1,5 @@
 package ru.practicum.shareit.user;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,9 +23,11 @@ public class UserClient extends BaseClient {
                         .build()
         );
     }
+
     public ResponseEntity<Object> createUser(UserDto userDto) {
         return post("", null, userDto);
     }
+
     public ResponseEntity<Object> getUserById(int userId) {
         return get("/" + userId, null, null);
     }
@@ -32,7 +35,6 @@ public class UserClient extends BaseClient {
     public ResponseEntity<Object> getAllUsers() {
         return get("", null, null);
     }
-
 
 
     public ResponseEntity<Object> updateUser(int userId, UserDto userDto) {

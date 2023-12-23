@@ -25,7 +25,7 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> createItem(@RequestHeader("X-Sharer-User-Id") int userId,
-                              @RequestBody @Valid ItemDto itemDto) {
+                                             @RequestBody @Valid ItemDto itemDto) {
         log.info("Выполняется POST-запрос. Создание нового предмета.");
         return itemClient.createItem(userId, itemDto);
     }
@@ -45,25 +45,25 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") int userId,
-                                       @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
-                                       @RequestParam(defaultValue = "10") @Positive int size) {
+                                                   @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+                                                   @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение предметов пользователя.");
         return itemClient.getItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchItem(@RequestHeader("X-Sharer-User-Id") int userId,
-                                 @RequestParam("text") String description,
-                                 @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
-                                 @RequestParam(defaultValue = "10") @Positive int size) {
+                                             @RequestParam("text") String description,
+                                             @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+                                             @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Выполняется GET-запрос. Получение предмета по ключевым словам.");
-        return itemClient.searchItem(description, from, size,userId);
+        return itemClient.searchItem(description, from, size, userId);
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") int userId,
-                                 @PathVariable int itemId,
-                                 @RequestBody @Valid CommentDto commentDto) {
+                                             @PathVariable int itemId,
+                                             @RequestBody @Valid CommentDto commentDto) {
         return itemClient.addComment(userId, itemId, commentDto);
     }
 }
