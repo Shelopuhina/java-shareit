@@ -36,13 +36,13 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") int userId,
                            @PathVariable int itemId) {
-        log.info("Выполняется GET-запрос. Получение уже существующего предмета с айди."+itemId+ " и юзерайди"+userId);
+        log.info("Выполняется GET-запрос. Получение уже существующего предмета с айди." + itemId + " и юзерайди" + userId);
         return service.getItemById(itemId, userId);
     }
 
     @GetMapping
     public List<ItemDto> getItemByUser(@RequestHeader("X-Sharer-User-Id") int userId,
-                                       @RequestParam(name = "from", defaultValue = "0")  Integer from,
+                                       @RequestParam(name = "from", defaultValue = "0") Integer from,
                                        @RequestParam(defaultValue = "10") int size) {
         log.info("Выполняется GET-запрос. Получение предметов пользователя.");
         return service.getItemsByUser(userId, from, size);
@@ -51,10 +51,10 @@ public class ItemController {
     @GetMapping("/search")
     public List<Item> searchItem(@RequestHeader("X-Sharer-User-Id") int userId,
                                  @RequestParam("text") String description,
-                                 @RequestParam(name = "from", defaultValue = "0")  Integer from,
+                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
                                  @RequestParam(defaultValue = "10") int size) {
         log.info("Выполняется GET-запрос. Получение предмета по ключевым словам.");
-        return service.searchItem(description, from, size,userId);
+        return service.searchItem(description, from, size, userId);
     }
 
     @PostMapping("/{itemId}/comment")
