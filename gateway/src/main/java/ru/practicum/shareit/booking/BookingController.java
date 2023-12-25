@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.model.BookingDtoIn;
+import ru.practicum.shareit.booking.dto.BookingDtoIn;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;

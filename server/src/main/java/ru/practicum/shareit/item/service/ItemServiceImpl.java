@@ -20,6 +20,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.util.PageUtils.getPageable;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
@@ -38,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final ItemRequestRepository itemRequestRepository;
 
-
+    @Transactional
     public ItemDto createItem(int userId, ItemDto itemDto) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
@@ -58,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item);
     }
 
-
+    @Transactional
     public ItemDto updateItem(int itemId, ItemDto itemDto, int userId) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
@@ -123,7 +125,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    public List<Item> searchItem(String text, int from, int size,int userId) {
+    public List<Item> searchItem(String text, int from, int size, int userId) {
         if (text.isBlank()) return new ArrayList<>();
         List<ItemDto> itemsFound = itemRepository.search(text, getPageable(from, size)).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         return itemsFound.stream().map(ItemMapper::toItem).collect(Collectors.toList());
@@ -131,6 +133,7 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
+    @Transactional
     @Override
     public CommentDto addComment(int userId, int itemId, CommentDto commentDto) {
         Optional<User> userOpt = userRepository.findById(userId);

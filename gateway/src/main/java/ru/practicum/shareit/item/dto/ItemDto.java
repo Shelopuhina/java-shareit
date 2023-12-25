@@ -1,8 +1,9 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.booking.model.BookingDtoOut;
+import ru.practicum.shareit.booking.dto.BookingDtoOut;
+import ru.practicum.shareit.item.dto.CommentDto;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

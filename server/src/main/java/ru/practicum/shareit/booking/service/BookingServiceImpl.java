@@ -3,20 +3,21 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exceptions.*;
-import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 import static ru.practicum.shareit.booking.dto.BookingMapper.bookingToDtoOut;
 import static ru.practicum.shareit.util.PageUtils.getPageable;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -34,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
-    @Transactional//прописать трансы
+    @Transactional
     public BookingDtoOut createBooking(BookingDtoIn bookingDtoIn) {
         int itemId = bookingDtoIn.getItemId();
         Optional<Item> itemOpt = itemRepository.findById(itemId);
@@ -84,7 +86,6 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    @Transactional
     public BookingDtoOut getBookingById(int bookingId, int userId) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");
@@ -98,7 +99,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingDtoOut> getUserBookings(int userId, String bookingState, int from, int size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
@@ -139,7 +139,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingDtoOut> getOwnerBookings(int userId, String bookingState, int from, int size) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new NotFoundException("Пользователь с id=" + userId + " не найден");

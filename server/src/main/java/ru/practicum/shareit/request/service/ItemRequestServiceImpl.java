@@ -15,19 +15,22 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-@Slf4j
+
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
+    @Transactional
     @Override
     public ItemRequestDto addItemRequest(int userId, ItemRequestDto itemRequestDto) {
         Optional<User> userOpt = userRepository.findById(userId);

@@ -8,11 +8,13 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public UserDto createUser(UserDto userDto) {
         try {
             User savedUser = userRepository.save(UserMapper.toUser(userDto));
@@ -30,11 +33,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     public void deleteUser(int id) {
         userRepository.deleteById(id);
 
     }
 
+    @Transactional
     public UserDto updateUser(int id, UserDto userDto) {
         try {
             Optional<User> userOpt = userRepository.findById(id);
